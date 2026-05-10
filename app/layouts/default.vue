@@ -260,7 +260,7 @@
 
   <!-- Page content -->
   <div :style="contentStyle">
-    <MpFlex justify="space-between" align-items="center" px="6" py="1.063rem">
+    <MpFlex v-if="!hidePageHeader" justify="space-between" align-items="center" px="6" py="1.063rem">
       <MpText size="h1" weight="semiBold">{{ activePageTitle }}</MpText>
       <MpButton left-icon="add">Action</MpButton>
     </MpFlex>
@@ -573,6 +573,7 @@
   )
 
   const isSubmenuOpen = computed(() => activeSubmenu.value !== null)
+  const hidePageHeader = computed(() => !!route.meta.hidePageHeader)
 
   // Active submenu data (title + items) for the panel
   const activeSubmenuData = computed(() => {
