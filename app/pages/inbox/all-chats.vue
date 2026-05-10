@@ -172,7 +172,6 @@
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'column',
-        backgroundColor: 'var(--mp-colors-background-neutral)',
         gap: '12px',
       }"
     >
