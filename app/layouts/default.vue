@@ -118,22 +118,51 @@
 
   <!-- Generic Submenu Panel — renders for any active submenu -->
   <aside v-if="activeSubmenuData" :style="submenuPanelStyle">
-    <div :style="{ flex: '1', overflowY: 'auto', backgroundColor: 'var(--mp-colors-background-surface)', paddingTop: '16px' }">
 
-      <!-- Section header -->
-      <MpFlex alignItems="center" justify="space-between" paddingX="4" :style="{ height: '36px' }">
-        <MpText
-          size="label-small"
-          weight="semiBold"
-          :style="{ color: 'var(--mp-colors-text-link)', letterSpacing: '0.08em', textTransform: 'uppercase' }"
-        >{{ activeSubmenuData.title }}</MpText>
+    <!-- Section header — outside scroll container so popover can overflow -->
+    <MpFlex
+      alignItems="center"
+      justify="space-between"
+      paddingX="4"
+      :style="{ height: '36px', flexShrink: '0', marginTop: '16px', position: 'relative', zIndex: '20' }"
+    >
+      <MpText
+        size="label-small"
+        weight="semiBold"
+        :style="{ color: 'var(--mp-colors-text-link)', letterSpacing: '0.08em', textTransform: 'uppercase' }"
+      >{{ activeSubmenuData.title }}</MpText>
 
-        <!-- Action buttons — Inbox only -->
-        <MpFlex v-if="activeSubmenuData.title === 'Inbox'" gap="1">
-          <MpButton size="sm" variant="ghost" left-icon="add-circular" aria-label="New conversation" />
-          <MpButton size="sm" variant="ghost" left-icon="search" aria-label="Search conversations" />
-        </MpFlex>
+      <!-- Action buttons — Inbox only -->
+      <MpFlex v-if="activeSubmenuData.title === 'Inbox'" gap="1">
+        <div :style="{ position: 'relative' }">
+          <MpButton
+            size="sm"
+            variant="ghost"
+            left-icon="add-circular"
+            aria-label="New conversation"
+            @click="toggleActionPopover"
+          />
+          <!-- Action Popover -->
+          <Transition name="popover">
+            <div v-if="showActionPopover" :style="actionPopoverStyle" v-click-outside="closeActionPopover">
+              <button
+                v-for="action in inboxActions"
+                :key="action.value"
+                :style="actionPopoverItemStyle(hoveredAction === action.value)"
+                @click="onInboxAction(action.value)"
+                @mouseenter="hoveredAction = action.value"
+                @mouseleave="hoveredAction = null"
+              >
+                {{ action.label }}
+              </button>
+            </div>
+          </Transition>
+        </div>
+        <MpButton size="sm" variant="ghost" left-icon="search" aria-label="Search conversations" />
       </MpFlex>
+    </MpFlex>
+
+    <div :style="{ flex: '1', overflowY: 'auto', overflowX: 'hidden', backgroundColor: 'var(--mp-colors-background-surface)' }">
 
       <!-- Submenu items -->
       <MpFlex direction="column" gap="1" paddingX="2">
@@ -264,6 +293,9 @@
     </div>
   </aside>
 
+  <!-- New Message Drawer -->
+  <NewMessageDrawer :isOpen="showNewMessageDrawer" @close="showNewMessageDrawer = false" />
+
   <!-- Page content -->
   <div :style="contentStyle">
     <MpFlex v-if="!hidePageHeader" justify="space-between" align-items="center" px="6" py="1.063rem">
@@ -279,6 +311,78 @@
   import { useRoute, useRouter } from 'vue-router'
   import { MpFlex, MpText, MpAvatar, MpIcon, MpBadge, MpButton, css } from '@mekari/pixel3'
   import { SIDEBAR_WIDTH, TOPBAR_HEIGHT } from '~/composables/usePixelLayout'
+  import NewMessageDrawer from '~/components/NewMessageDrawer.vue'
+
+  // ── Inbox action popover ────────────────────────────────────
+  const showActionPopover = ref(false)
+  const showNewMessageDrawer = ref(false)
+  const hoveredAction = ref<string | null>(null)
+
+  const inboxActions = [
+    { value: 'new-message', label: 'New message' },
+    { value: 'create-wa-group', label: 'Create WA group' },
+  ]
+
+  function toggleActionPopover() {
+    showActionPopover.value = !showActionPopover.value
+  }
+
+  function closeActionPopover() {
+    showActionPopover.value = false
+  }
+
+  function onInboxAction(value: string) {
+    showActionPopover.value = false
+    if (value === 'new-message') {
+      showNewMessageDrawer.value = true
+    }
+  }
+
+  // v-click-outside directive
+  const vClickOutside = {
+    mounted(el: HTMLElement, binding: { value: () => void }) {
+      el._clickOutsideHandler = (event: Event) => {
+        if (!el.contains(event.target as Node)) {
+          binding.value()
+        }
+      }
+      document.addEventListener('click', el._clickOutsideHandler, true)
+    },
+    unmounted(el: HTMLElement) {
+      document.removeEventListener('click', el._clickOutsideHandler, true)
+    },
+  }
+
+  const actionPopoverStyle = {
+    position: 'absolute' as const,
+    top: 'calc(100% + 4px)',
+    left: '0',
+    zIndex: '1000',
+    width: '164px',
+    backgroundColor: 'var(--mp-colors-background-stage)',
+    border: '1px solid var(--mp-colors-border-bold)',
+    borderRadius: '6px',
+    boxShadow: '0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -2px rgba(0,0,0,0.05)',
+    overflow: 'hidden',
+    padding: '8px 0',
+    display: 'flex',
+    flexDirection: 'column' as const,
+  }
+
+  function actionPopoverItemStyle(isHovered: boolean) {
+    return {
+      padding: '8px 12px',
+      fontSize: '14px',
+      fontWeight: '400',
+      color: 'var(--mp-colors-text-default)',
+      backgroundColor: isHovered ? 'var(--mp-colors-background-neutral-hovered)' : 'transparent',
+      border: 'none',
+      cursor: 'pointer',
+      textAlign: 'left' as const,
+      width: '100%',
+      transition: 'background-color 100ms ease',
+    }
+  }
 
   const ICON_SIDEBAR_WIDTH = '52px'
   const SUBMENU_WIDTH      = '212px'
@@ -665,7 +769,7 @@
     display: 'flex',
     flexDirection: 'column' as const,
     zIndex: '10',
-    overflow: 'hidden',
+    overflow: 'visible',
     backgroundColor: 'var(--mp-colors-background-surface)',
   }))
 
@@ -717,4 +821,15 @@
 .nav-item:not(.nav-item--active):hover :deep(svg.mp-icon) {
   --mp-icon-color: var(--mp-colors-icon-brand) !important;
 }
-</style>c
+
+/* Action popover transition */
+.popover-enter-active,
+.popover-leave-active {
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+.popover-enter-from,
+.popover-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+</style>
