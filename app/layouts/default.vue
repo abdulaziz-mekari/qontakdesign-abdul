@@ -121,12 +121,18 @@
     <div :style="{ flex: '1', overflowY: 'auto', backgroundColor: 'var(--mp-colors-background-surface)', paddingTop: '16px' }">
 
       <!-- Section header -->
-      <MpFlex alignItems="center" paddingX="4" :style="{ height: '36px' }">
+      <MpFlex alignItems="center" justify="space-between" paddingX="4" :style="{ height: '36px' }">
         <MpText
           size="label-small"
           weight="semiBold"
           :style="{ color: 'var(--mp-colors-text-link)', letterSpacing: '0.08em', textTransform: 'uppercase' }"
         >{{ activeSubmenuData.title }}</MpText>
+
+        <!-- Action buttons — Inbox only -->
+        <MpFlex v-if="activeSubmenuData.title === 'Inbox'" gap="1">
+          <MpButton size="sm" variant="ghost" left-icon="add-circular" aria-label="New conversation" />
+          <MpButton size="sm" variant="ghost" left-icon="search" aria-label="Search conversations" />
+        </MpFlex>
       </MpFlex>
 
       <!-- Submenu items -->
