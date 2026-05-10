@@ -13,22 +13,28 @@
       <!-- Header -->
       <div :style="listHeaderStyle">
         <MpText size="h2" weight="semiBold" :style="{ flex: '1' }"
-          >All inboxes</MpText
+          >All chats</MpText
         >
       </div>
 
       <!-- Filter bar -->
       <div :style="filterBarStyle">
-        <div :style="filterDropdownStyle" :class="hoverClass">
-          <MpText size="label-small" :style="{ flex: '1' }">Newest</MpText>
-          <MpIcon name="chevrons-down" size="sm" color="icon.default" />
-        </div>
-        <div :style="filterIconStyle" :class="hoverClass">
-          <MpIcon name="done" size="sm" color="icon.default" />
-        </div>
-        <div :style="filterIconStyle" :class="hoverClass">
-          <MpIcon name="filter" size="sm" color="icon.default" />
-        </div>
+        <MpSelect v-model="sortOrder" :style="{ flex: '1' }">
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+        </MpSelect>
+        <MpButton
+          size="md"
+          variant="ghost"
+          left-icon="done"
+          aria-label="Mark as done"
+        />
+        <MpButton
+          size="md"
+          variant="ghost"
+          left-icon="filter"
+          aria-label="Filter"
+        />
       </div>
 
       <!-- Conversation items -->
@@ -183,13 +189,14 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { MpText, MpIcon, css } from "@mekari/pixel3";
+import { MpText, MpIcon, MpSelect, MpButton, css } from "@mekari/pixel3";
 import { TOPBAR_HEIGHT } from "~/composables/usePixelLayout";
 
 definePageMeta({ layout: "default", hidePageHeader: true });
 
 const activeConv = ref<number | null>(null);
 const hoveredConv = ref<number | null>(null);
+const sortOrder = ref("newest");
 
 // ── Mock conversations ───────────────────────────────────────
 const conversations = [
@@ -429,8 +436,8 @@ const filterIconStyle = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  width: "32px",
-  height: "32px",
+  width: "36px",
+  height: "36px",
   borderRadius: "6px",
   cursor: "pointer",
 };
