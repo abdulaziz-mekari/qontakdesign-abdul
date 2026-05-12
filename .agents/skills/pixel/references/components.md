@@ -50,6 +50,71 @@ Use this file to map UI needs to Pixel components, then verify uncertain props w
 </MpFormControl>
 ```
 
+### Form Validation on Submit
+
+Validate required fields on submit click. Show errors inline — never disable the submit button to prevent submission.
+
+**Error message wording (sentence case):**
+- Text input / textarea / rich text editor: `You must enter {field name}`
+- Select / dropdown / tag input: `You must select {field name}`
+- Tag input with minimum count: `You must select at least {n} {field name}`
+
+**Field name uses lowercase** — e.g. `You must select sender`, not `You must select Sender`.
+
+**Implementation:**
+
+```vue
+<script setup lang="ts">
+const errors = ref({ sender: '', recipients: '', bodyMessage: '' })
+
+function clearError(field: keyof typeof errors.value) {
+  errors.value[field] = ''
+}
+
+function validateAndSend() {
+  errors.value.sender      = form.value.sender               ? '' : 'You must select sender'
+  errors.value.recipients  = form.value.recipients.length > 0 ? '' : 'You must select at least 1 recipients'
+  errors.value.bodyMessage = form.value.bodyMessage.trim()    ? '' : 'You must enter body message'
+
+  if (Object.values(errors.value).some(Boolean)) return
+  // submit
+}
+</script>
+
+<template>
+  <!-- Select field -->
+  <MpFormControl :isInvalid="!!errors.sender">
+    <MpFormLabel>Sender <span style="color: var(--mp-colors-text-danger)">*</span></MpFormLabel>
+    <MpSelect v-model="form.sender" @change="clearError('sender')">…</MpSelect>
+    <MpFormErrorMessage v-if="errors.sender">{{ errors.sender }}</MpFormErrorMessage>
+  </MpFormControl>
+
+  <!-- Tag input — pass isInvalid directly on MpInputTag, keep help text always visible -->
+  <MpFormControl :isInvalid="!!errors.recipients">
+    <MpFormLabel>Recipients <span style="color: var(--mp-colors-text-danger)">*</span></MpFormLabel>
+    <MpInputTag :isInvalid="!!errors.recipients" @change="(tags) => { onRecipientsChange(tags); clearError('recipients') }" />
+    <MpFormHelpText>Select up to 3 customers</MpFormHelpText>
+    <MpFormErrorMessage v-if="errors.recipients">{{ errors.recipients }}</MpFormErrorMessage>
+  </MpFormControl>
+
+  <!-- Text input -->
+  <MpFormControl :isInvalid="!!errors.bodyMessage">
+    <MpFormLabel>Body message <span style="color: var(--mp-colors-text-danger)">*</span></MpFormLabel>
+    <MpInput v-model="form.bodyMessage" @input="clearError('bodyMessage')" />
+    <MpFormErrorMessage v-if="errors.bodyMessage">{{ errors.bodyMessage }}</MpFormErrorMessage>
+  </MpFormControl>
+
+  <MpButton variant="primary" @click="validateAndSend">Submit</MpButton>
+</template>
+```
+
+**Rules:**
+- Always use `MpFormControl :isInvalid` to trigger the red border on the wrapper.
+- For `MpInputTag`, also pass `:isInvalid` directly on the component itself.
+- Help text (`MpFormHelpText`) stays visible even when the error is showing — the error appears below it.
+- Errors clear as the user corrects the field (`clearError` on `@change` / `@input`).
+- Submit button is always enabled; validation runs on click.
+
 ### Modal Action Flow
 
 ```vue

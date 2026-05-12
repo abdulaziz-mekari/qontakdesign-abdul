@@ -300,7 +300,7 @@
   <div :style="contentStyle">
     <MpFlex v-if="!hidePageHeader" justify="space-between" align-items="center" px="6" py="1.063rem">
       <MpText size="h1" weight="semiBold">{{ activePageTitle }}</MpText>
-      <MpButton left-icon="add">Action</MpButton>
+      <MpButton v-if="!hidePageAction" left-icon="add">Action</MpButton>
     </MpFlex>
     <slot />
   </div>
@@ -629,8 +629,9 @@
     ],
   ]
 
-  // ─── Active page title (driven by nav structure) ─────────────────────────────
+  // ─── Active page title (driven by nav structure, overridable via route.meta.pageTitle) ──
   const activePageTitle = computed(() => {
+    if (route.meta.pageTitle) return route.meta.pageTitle as string
     const path = route.path
     for (const group of navGroups) {
       for (const item of group) {
@@ -684,6 +685,7 @@
 
   const isSubmenuOpen = computed(() => activeSubmenu.value !== null)
   const hidePageHeader = computed(() => !!route.meta.hidePageHeader)
+  const hidePageAction = computed(() => !!route.meta.hidePageAction)
 
   // Active submenu data (title + items) for the panel
   const activeSubmenuData = computed(() => {
