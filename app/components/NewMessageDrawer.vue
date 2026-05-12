@@ -21,7 +21,7 @@
           flexShrink: '0',
         }"
       >
-        <MpText size="h3" weight="semiBold">New message</MpText>
+        <MpText size="label" weight="semiBold">New message</MpText>
         <MpDrawerCloseButton
           @click="$emit('close')"
           :style="{ position: 'static' }"
@@ -56,7 +56,7 @@
             <MpText size="h3" weight="semiBold">Sender and recipients</MpText>
 
             <!-- Sender -->
-            <MpFormControl>
+            <MpFormControl :isInvalid="!!errors.sender">
               <MpFormLabel>
                 Sender
                 <span :style="{ color: 'var(--mp-colors-text-danger)' }"
@@ -66,6 +66,7 @@
               <MpSelect
                 v-model="form.sender"
                 placeholder="Select sender account"
+                @change="clearError('sender')"
               >
                 <option value="hummingbird-wa">
                   Hummingbird Official (WhatsApp)
@@ -74,10 +75,11 @@
                   Hummingbird Official (Instagram)
                 </option>
               </MpSelect>
+              <MpFormErrorMessage v-if="errors.sender">{{ errors.sender }}</MpFormErrorMessage>
             </MpFormControl>
 
             <!-- Recipients -->
-            <MpFormControl>
+            <MpFormControl :isInvalid="!!errors.recipients">
               <MpFormLabel>
                 Recipients
                 <span :style="{ color: 'var(--mp-colors-text-danger)' }"
@@ -85,6 +87,7 @@
                 >
               </MpFormLabel>
               <MpInputTag
+                :isInvalid="!!errors.recipients"
                 :data="form.recipients"
                 :suggestions="filteredCustomers"
                 suggestionKey="label"
@@ -94,7 +97,7 @@
                 :isShowIconChevronDown="false"
                 widthContent="320px"
                 placeholder="Search customer name or phone number"
-                @change="onRecipientsChange"
+                @change="(tags) => { onRecipientsChange(tags); clearError('recipients') }"
                 @search="onRecipientsSearch"
               >
                 <template #default="item">
@@ -126,6 +129,7 @@
                 </template>
               </MpInputTag>
               <MpFormHelpText>Select up to 3 customers</MpFormHelpText>
+              <MpFormErrorMessage v-if="errors.recipients">{{ errors.recipients }}</MpFormErrorMessage>
             </MpFormControl>
           </div>
 
@@ -175,7 +179,7 @@
             </MpFormControl>
 
             <!-- Body message -->
-            <MpFormControl>
+            <MpFormControl :isInvalid="!!errors.bodyMessage">
               <div
                 :style="{
                   display: 'flex',
@@ -199,8 +203,9 @@
                 placeholder="Enter message"
                 :maxlength="550"
                 :options="bodyToolbarOptions"
-                @change="onBodyChange"
+                @change="(html, editor) => { onBodyChange(html, editor); clearError('bodyMessage') }"
               />
+              <MpFormErrorMessage v-if="errors.bodyMessage">{{ errors.bodyMessage }}</MpFormErrorMessage>
             </MpFormControl>
 
             <!-- Footer message -->
@@ -267,10 +272,8 @@
         <!-- Actions -->
         <div :style="{ display: 'flex', alignItems: 'center', gap: '8px' }">
           <MpButton variant="ghost" @click="$emit('close')">Cancel</MpButton>
-          <MpButton variant="outline">Preview</MpButton>
-          <MpButton variant="primary" :isDisabled="!canSend"
-            >Send message</MpButton
-          >
+          <MpButton variant="secondary">Preview</MpButton>
+          <MpButton variant="primary" @click="validateAndSend">Send message</MpButton>
         </div>
       </MpDrawerFooter>
     </MpDrawerContent>
@@ -291,6 +294,7 @@ import {
   MpFormControl,
   MpFormLabel,
   MpFormHelpText,
+  MpFormErrorMessage,
   MpSelect,
   MpInput,
   MpInputTag,
@@ -373,13 +377,22 @@ function onBodyChange(html: string, editor: any) {
   bodyCharCount.value = text.length;
 }
 
-// ── Can send ─────────────────────────────────────────────────
-const canSend = computed(
-  () =>
-    form.value.sender &&
-    form.value.recipients.length > 0 &&
-    bodyCharCount.value > 0,
-);
+// ── Validation ───────────────────────────────────────────────
+const errors = ref({ sender: "", recipients: "", bodyMessage: "" });
+
+function clearError(field: keyof typeof errors.value) {
+  errors.value[field] = "";
+}
+
+function validateAndSend() {
+  errors.value.sender = form.value.sender ? "" : "You must select sender";
+  errors.value.recipients = form.value.recipients.length > 0 ? "" : "You must select at least 1 recipients";
+  errors.value.bodyMessage = bodyCharCount.value > 0 ? "" : "You must enter body message";
+
+  const isValid = !errors.value.sender && !errors.value.recipients && !errors.value.bodyMessage;
+  if (!isValid) return;
+  // TODO: submit
+}
 </script>
 
 <style scoped>
