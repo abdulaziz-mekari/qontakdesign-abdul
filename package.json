@@ -7,11 +7,13 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "check:i18n": "node scripts/check-i18n-keys.mjs"
   },
   "dependencies": {
     "@mekari/pixel3": "^1.0.11",
     "@mekari/pixel3-postcss": "^1.0.11",
+    "@nuxtjs/i18n": "^10.3.0",
     "nuxt": "^4.4.2",
     "vue": "^3.5.33",
     "vue-router": "^5.0.6"
