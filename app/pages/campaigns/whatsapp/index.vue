@@ -5,8 +5,8 @@
       <!-- Tabs -->
       <MpTabs id="campaign-tabs" v-model="currentTab" is-manual :is-show-border="false">
         <MpTabList :class="css({ px: '6', pb: '0', '& .mp-tab-list__list': { marginBottom: '0', paddingBottom: '0' } })">
-          <MpTab>One-time campaign</MpTab>
-          <MpTab>Recurring campaign</MpTab>
+          <MpTab>{{ $t('campaigns.whatsapp.tabs.oneTime') }}</MpTab>
+          <MpTab>{{ $t('campaigns.whatsapp.tabs.recurring') }}</MpTab>
         </MpTabList>
 
         <MpTabPanels :class="css({ p: '0' })">
@@ -16,13 +16,13 @@
 
               <!-- Section header -->
               <MpFlex direction="column" gap="1">
-                <MpText size="h2" weight="semiBold">One time campaign</MpText>
+                <MpText size="h2" weight="semiBold">{{ $t('campaigns.whatsapp.oneTime.title') }}</MpText>
                 <MpFlex gap="1" alignItems="center">
                   <MpText size="body" color="text.secondary">
-                    Reach your customers by sending one-time WhatsApp campaign.
+                    {{ $t('campaigns.whatsapp.oneTime.description') }}
                   </MpText>
                   <MpText size="body" :class="css({ color: 'blue.600', cursor: 'pointer', _hover: { textDecoration: 'underline' } })">
-                    Learn more
+                    {{ $t('campaigns.whatsapp.oneTime.learnMore') }}
                   </MpText>
                 </MpFlex>
               </MpFlex>
@@ -30,23 +30,23 @@
               <!-- Filter bar -->
               <MpFlex gap="3" alignItems="center">
                 <div style="width: 240px; flex-shrink: 0">
-                  <MpSelect v-model="categoryFilter" id="category-filter" placeholder="All categories" is-clearable>
-                    <option value="marketing">Marketing</option>
-                    <option value="utility">Utility</option>
-                    <option value="authentication">Authentication</option>
+                  <MpSelect v-model="categoryFilter" id="category-filter" :placeholder="$t('campaigns.whatsapp.filters.allCategories')" is-clearable>
+                    <option value="marketing">{{ $t('campaigns.whatsapp.filters.category.marketing') }}</option>
+                    <option value="utility">{{ $t('campaigns.whatsapp.filters.category.utility') }}</option>
+                    <option value="authentication">{{ $t('campaigns.whatsapp.filters.category.authentication') }}</option>
                   </MpSelect>
                 </div>
 
                 <div style="width: 240px; flex-shrink: 0">
-                  <MpSelect v-model="statusFilter" id="status-filter" placeholder="All status" is-clearable>
-                    <option value="scheduled">Scheduled</option>
-                    <option value="in_progress">In progress</option>
-                    <option value="partially_completed">Partially completed</option>
-                    <option value="completed">Completed</option>
-                    <option value="failed">Failed</option>
-                    <option value="canceled">Canceled</option>
-                    <option value="stopped">Stopped - WhatsApp</option>
-                    <option value="insufficient_balance">Insufficient balance</option>
+                  <MpSelect v-model="statusFilter" id="status-filter" :placeholder="$t('campaigns.whatsapp.filters.allStatus')" is-clearable>
+                    <option value="scheduled">{{ $t('campaigns.whatsapp.filters.status.scheduled') }}</option>
+                    <option value="in_progress">{{ $t('campaigns.whatsapp.filters.status.inProgress') }}</option>
+                    <option value="partially_completed">{{ $t('campaigns.whatsapp.filters.status.partiallyCompleted') }}</option>
+                    <option value="completed">{{ $t('campaigns.whatsapp.filters.status.completed') }}</option>
+                    <option value="failed">{{ $t('campaigns.whatsapp.filters.status.failed') }}</option>
+                    <option value="canceled">{{ $t('campaigns.whatsapp.filters.status.canceled') }}</option>
+                    <option value="stopped">{{ $t('campaigns.whatsapp.filters.status.stoppedWhatsapp') }}</option>
+                    <option value="insufficient_balance">{{ $t('campaigns.whatsapp.filters.status.insufficientBalance') }}</option>
                   </MpSelect>
                 </div>
 
@@ -55,7 +55,7 @@
                     <MpInput
                       id="search-campaign"
                       v-model="searchQuery"
-                      placeholder="Search campaign name"
+                      :placeholder="$t('campaigns.whatsapp.filters.searchPlaceholder')"
                       left-icon="search"
                     />
                   </div>
@@ -69,22 +69,22 @@
                   <MpTableHead>
                     <MpTableRow>
                       <MpTableCell as="th">
-                        <MpText size="label" weight="semiBold">Campaign name</MpText>
+                        <MpText size="label" weight="semiBold">{{ $t('campaigns.whatsapp.table.campaignName') }}</MpText>
                       </MpTableCell>
                       <MpTableCell as="th">
-                        <MpText size="label" weight="semiBold">Message template</MpText>
+                        <MpText size="label" weight="semiBold">{{ $t('campaigns.whatsapp.table.messageTemplate') }}</MpText>
                       </MpTableCell>
                       <MpTableCell as="th">
-                        <MpText size="label" weight="semiBold">Template category</MpText>
+                        <MpText size="label" weight="semiBold">{{ $t('campaigns.whatsapp.table.templateCategory') }}</MpText>
                       </MpTableCell>
                       <MpTableCell as="th">
-                        <MpText size="label" weight="semiBold">Status</MpText>
+                        <MpText size="label" weight="semiBold">{{ $t('campaigns.whatsapp.table.status') }}</MpText>
                       </MpTableCell>
                       <MpTableCell as="th">
-                        <MpText size="label" weight="semiBold">Recipient</MpText>
+                        <MpText size="label" weight="semiBold">{{ $t('campaigns.whatsapp.table.recipient') }}</MpText>
                       </MpTableCell>
                       <MpTableCell as="th">
-                        <MpText size="label" weight="semiBold">Delivered</MpText>
+                        <MpText size="label" weight="semiBold">{{ $t('campaigns.whatsapp.table.delivered') }}</MpText>
                       </MpTableCell>
                       <MpTableCell as="th" :style="{ position: 'sticky', right: '0', background: 'var(--mp-colors-background-surface)', boxShadow: 'var(--mp-shadows-xs)', borderLeft: isTableOverflowing ? '1px solid var(--mp-colors-border-default)' : 'none' }" />
                     </MpTableRow>
@@ -111,7 +111,7 @@
                         <MpText size="label">{{ row.delivered.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') }}</MpText>
                       </MpTableCell>
                       <MpTableCell as="td" :style="{ position: 'sticky', right: '0', background: 'var(--mp-colors-background-stage)', boxShadow: 'var(--mp-shadows-xs)', borderLeft: isTableOverflowing ? '1px solid var(--mp-colors-border-default)' : 'none' }">
-                        <MpButton variant="secondary" right-icon="chevrons-down" size="md">Actions</MpButton>
+                        <MpButton variant="secondary" right-icon="chevrons-down" size="md">{{ $t('campaigns.whatsapp.table.actions') }}</MpButton>
                       </MpTableCell>
                     </MpTableRow>
                   </MpTableBody>
@@ -122,7 +122,7 @@
               <!-- Pagination -->
               <MpFlex justifyContent="space-between" alignItems="center">
                 <MpFlex gap="2" alignItems="center">
-                  <MpText size="body-small" color="text.secondary">Rows per page</MpText>
+                  <MpText size="body-small" color="text.secondary">{{ $t('campaigns.whatsapp.pagination.rowsPerPage') }}</MpText>
                   <MpSelect v-model="rowsPerPage" id="rows-per-page" size="sm" :style="{ width: '72px' }">
                     <option value="10">10</option>
                     <option value="25">25</option>
@@ -132,14 +132,14 @@
 
                 <MpFlex gap="3" alignItems="center">
                   <MpText size="body-small" color="text.secondary">
-                    Showing {{ showingStart }}-{{ showingEnd }} of {{ totalRows }}
+                    {{ $t('campaigns.whatsapp.pagination.showing', { start: showingStart, end: showingEnd, total: totalRows }) }}
                   </MpText>
                   <MpFlex gap="2" alignItems="center">
                     <MpButton
                       variant="ghost"
                       left-icon="chevron-left"
                       size="sm"
-                      aria-label="Previous page"
+                      :aria-label="$t('campaigns.whatsapp.pagination.previous')"
                       :is-disabled="currentPage <= 1"
                       @click="currentPage--"
                     />
@@ -147,13 +147,13 @@
                       <MpSelect v-model="currentPageStr" id="page-select" size="sm" :style="{ width: '60px' }">
                         <option v-for="p in totalPages" :key="p" :value="String(p)">{{ p }}</option>
                       </MpSelect>
-                      <MpText size="body-small" color="text.secondary">of {{ totalPages }} pages</MpText>
+                      <MpText size="body-small" color="text.secondary">{{ $t('campaigns.whatsapp.pagination.ofPages', { total: totalPages }) }}</MpText>
                     </MpFlex>
                     <MpButton
                       variant="ghost"
                       left-icon="chevron-right"
                       size="sm"
-                      aria-label="Next page"
+                      :aria-label="$t('campaigns.whatsapp.pagination.next')"
                       :is-disabled="currentPage >= totalPages"
                       @click="currentPage++"
                     />
@@ -168,8 +168,8 @@
           <MpTabPanel>
             <div :class="css({ bg: 'background.stage', borderTopLeftRadius: 'md' })" :style="{ borderTop: '1px solid var(--mp-colors-border-default)', borderLeft: '1px solid var(--mp-colors-border-default)' }">
             <MpFlex direction="column" gap="4" p="6">
-              <MpText size="h2" weight="semiBold">Recurring campaign</MpText>
-              <MpText size="body" color="text.secondary">No recurring campaigns yet.</MpText>
+              <MpText size="h2" weight="semiBold">{{ $t('campaigns.whatsapp.recurring.title') }}</MpText>
+              <MpText size="body" color="text.secondary">{{ $t('campaigns.whatsapp.recurring.empty') }}</MpText>
             </MpFlex>
             </div>
           </MpTabPanel>

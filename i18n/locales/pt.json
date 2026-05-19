@@ -1,0 +1,55 @@
+{
+  "campaigns": {
+    "whatsapp": {
+      "tabs": {
+        "oneTime": "Campanha única",
+        "recurring": "Campanha recorrente"
+      },
+      "oneTime": {
+        "title": "Campanha única",
+        "description": "Alcance seus clientes enviando uma campanha única no WhatsApp.",
+        "learnMore": "Saiba mais"
+      },
+      "recurring": {
+        "title": "Campanha recorrente",
+        "empty": "Ainda não há campanhas recorrentes."
+      },
+      "filters": {
+        "allCategories": "Todas as categorias",
+        "allStatus": "Todos os status",
+        "searchPlaceholder": "Buscar nome da campanha",
+        "category": {
+          "marketing": "Marketing",
+          "utility": "Utilidade",
+          "authentication": "Autenticação"
+        },
+        "status": {
+          "scheduled": "Agendada",
+          "inProgress": "Em andamento",
+          "partiallyCompleted": "Parcialmente concluída",
+          "completed": "Concluída",
+          "failed": "Falhou",
+          "canceled": "Cancelada",
+          "stoppedWhatsapp": "Interrompida - WhatsApp",
+          "insufficientBalance": "Saldo insuficiente"
+        }
+      },
+      "table": {
+        "campaignName": "Nome da campanha",
+        "messageTemplate": "Template da mensagem",
+        "templateCategory": "Categoria do template",
+        "status": "Status",
+        "recipient": "Destinatário",
+        "delivered": "Entregue",
+        "actions": "Ações"
+      },
+      "pagination": {
+        "rowsPerPage": "Linhas por página",
+        "showing": "Mostrando {start}-{end} de {total}",
+        "ofPages": "de {total} páginas",
+        "previous": "Página anterior",
+        "next": "Próxima página"
+      }
+    }
+  }
+}

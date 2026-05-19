@@ -1,0 +1,55 @@
+{
+  "campaigns": {
+    "whatsapp": {
+      "tabs": {
+        "oneTime": "Kampanye sekali kirim",
+        "recurring": "Kampanye berulang"
+      },
+      "oneTime": {
+        "title": "Kampanye sekali kirim",
+        "description": "Jangkau pelanggan Anda dengan mengirim kampanye WhatsApp sekali kirim.",
+        "learnMore": "Pelajari selengkapnya"
+      },
+      "recurring": {
+        "title": "Kampanye berulang",
+        "empty": "Belum ada kampanye berulang."
+      },
+      "filters": {
+        "allCategories": "Semua kategori",
+        "allStatus": "Semua status",
+        "searchPlaceholder": "Cari nama kampanye",
+        "category": {
+          "marketing": "Marketing",
+          "utility": "Utilitas",
+          "authentication": "Autentikasi"
+        },
+        "status": {
+          "scheduled": "Terjadwal",
+          "inProgress": "Sedang berjalan",
+          "partiallyCompleted": "Selesai sebagian",
+          "completed": "Selesai",
+          "failed": "Gagal",
+          "canceled": "Dibatalkan",
+          "stoppedWhatsapp": "Dihentikan - WhatsApp",
+          "insufficientBalance": "Saldo tidak cukup"
+        }
+      },
+      "table": {
+        "campaignName": "Nama kampanye",
+        "messageTemplate": "Template pesan",
+        "templateCategory": "Kategori template",
+        "status": "Status",
+        "recipient": "Penerima",
+        "delivered": "Terkirim",
+        "actions": "Aksi"
+      },
+      "pagination": {
+        "rowsPerPage": "Baris per halaman",
+        "showing": "Menampilkan {start}-{end} dari {total}",
+        "ofPages": "dari {total} halaman",
+        "previous": "Halaman sebelumnya",
+        "next": "Halaman berikutnya"
+      }
+    }
+  }
+}
