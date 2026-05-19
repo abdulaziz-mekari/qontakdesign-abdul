@@ -10,7 +10,6 @@
         </MpTabList>
 
         <MpTabPanels :class="css({ p: '0' })">
-          <!-- One-time campaign panel -->
           <MpTabPanel>
             <div :class="css({ bg: 'background.stage', borderTopLeftRadius: 'md' })" :style="{ borderTop: '1px solid var(--mp-colors-border-default)', borderLeft: '1px solid var(--mp-colors-border-default)' }">
             <MpFlex direction="column" gap="4" p="6">
@@ -64,6 +63,7 @@
               </MpFlex>
 
               <!-- Table -->
+              <div ref="tableContainerRef">
               <MpTableContainer>
                 <MpTable is-hoverable>
                   <MpTableHead>
@@ -86,14 +86,14 @@
                       <MpTableCell as="th">
                         <MpText size="label" weight="semiBold">Delivered</MpText>
                       </MpTableCell>
-                      <MpTableCell as="th" />
+                      <MpTableCell as="th" :style="{ position: 'sticky', right: '0', background: 'var(--mp-colors-background-surface)', boxShadow: 'var(--mp-shadows-xs)', borderLeft: isTableOverflowing ? '1px solid var(--mp-colors-border-default)' : 'none' }" />
                     </MpTableRow>
                   </MpTableHead>
 
                   <MpTableBody>
                     <MpTableRow v-for="row in paginatedData" :key="row.id">
                       <MpTableCell as="td">
-                        <MpText size="label" :class="css({ cursor: 'pointer', _hover: { color: 'text.link', textDecoration: 'underline' } })">{{ row.name }}</MpText>
+                        <MpText size="label" :class="css({ cursor: 'pointer', _hover: { color: 'text.link', textDecoration: 'underline' } })" @click="router.push(`/campaigns/whatsapp/${row.id}`)">{{ row.name }}</MpText>
                       </MpTableCell>
                       <MpTableCell as="td">
                         <MpText size="label">{{ row.template }}</MpText>
@@ -105,18 +105,19 @@
                         <MpBadge for="tableStatus" :type="statusVariant(row.status)">{{ row.status }}</MpBadge>
                       </MpTableCell>
                       <MpTableCell as="td">
-                        <MpText size="label">{{ row.recipient.toLocaleString('id-ID') }}</MpText>
+                        <MpText size="label">{{ row.recipient.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') }}</MpText>
                       </MpTableCell>
                       <MpTableCell as="td">
-                        <MpText size="label">{{ row.delivered.toLocaleString('id-ID') }}</MpText>
+                        <MpText size="label">{{ row.delivered.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') }}</MpText>
                       </MpTableCell>
-                      <MpTableCell as="td">
+                      <MpTableCell as="td" :style="{ position: 'sticky', right: '0', background: 'var(--mp-colors-background-stage)', boxShadow: 'var(--mp-shadows-xs)', borderLeft: isTableOverflowing ? '1px solid var(--mp-colors-border-default)' : 'none' }">
                         <MpButton variant="secondary" right-icon="chevrons-down" size="md">Actions</MpButton>
                       </MpTableCell>
                     </MpTableRow>
                   </MpTableBody>
                 </MpTable>
               </MpTableContainer>
+              </div>
 
               <!-- Pagination -->
               <MpFlex justifyContent="space-between" alignItems="center">
@@ -164,7 +165,6 @@
             </div>
           </MpTabPanel>
 
-          <!-- Recurring campaign panel -->
           <MpTabPanel>
             <div :class="css({ bg: 'background.stage', borderTopLeftRadius: 'md' })" :style="{ borderTop: '1px solid var(--mp-colors-border-default)', borderLeft: '1px solid var(--mp-colors-border-default)' }">
             <MpFlex direction="column" gap="4" p="6">
@@ -181,7 +181,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useCampaigns } from '~/composables/useCampaigns'
 import {
   css,
   MpFlex,
@@ -211,7 +213,26 @@ definePageMeta({
   pageActionRoute: '/campaigns/whatsapp/create',
 })
 
+const router = useRouter()
 const pageClass = css({ flexGrow: '1' })
+
+// --- Sticky column overflow detection ---
+const tableContainerRef = ref<HTMLElement | null>(null)
+const isTableOverflowing = ref(false)
+
+let resizeObserver: ResizeObserver | null = null
+
+onMounted(() => {
+  const wrapper = tableContainerRef.value as HTMLElement | null
+  if (!wrapper) return
+  const el = wrapper.querySelector('[data-pixel-component="MpTableContainer"]') ?? wrapper
+  const check = () => { isTableOverflowing.value = el.scrollWidth > el.clientWidth }
+  check()
+  resizeObserver = new ResizeObserver(check)
+  resizeObserver.observe(el)
+})
+
+onUnmounted(() => { resizeObserver?.disconnect() })
 
 // --- Tabs ---
 const currentTab = ref(0)
@@ -239,23 +260,7 @@ function statusVariant(status: string): BadgeVariant {
 }
 
 // --- Table data ---
-const tableData = [
-  { id: 1,  name: 'promo akhir tahun',    template: 'promo_akhir_tahun',       category: 'Marketing', status: 'Scheduled',            recipient: 24256, delivered: 22120 },
-  { id: 2,  name: 'corporate nitiative',  template: 'corporate_initiative',    category: 'Marketing', status: 'In progress',          recipient: 5559,  delivered: 5800  },
-  { id: 3,  name: 'corporate nitiative',  template: 'influencer_instagram',    category: 'Marketing', status: 'Partially completed',  recipient: 2228,  delivered: 4400  },
-  { id: 4,  name: 'influencer nstagram',  template: 'knowledge_exchange',      category: 'Marketing', status: 'Stopped - WhatsApp',   recipient: 7545,  delivered: 1300  },
-  { id: 5,  name: 'knowledge exchange',   template: 'clearance_event',         category: 'Marketing', status: 'Insufficient balance', recipient: 4688,  delivered: 7300  },
-  { id: 6,  name: 'clearance event',      template: 'industry_advancement',    category: 'Marketing', status: 'Failed',               recipient: 3697,  delivered: 9200  },
-  { id: 7,  name: 'industry advancement', template: 'global_conference',       category: 'Marketing', status: 'Canceled',             recipient: 2473,  delivered: 8800  },
-  { id: 8,  name: 'global conference',    template: 'limited_time_offer',      category: 'Utility',   status: 'Completed',            recipient: 1005,  delivered: 8100  },
-  { id: 9,  name: 'limited time_offer',   template: 'loyalty_rewards',         category: 'Auth',      status: 'Completed',            recipient: 4297,  delivered: 4200  },
-  { id: 10, name: 'loyalty rewards',      template: 'professional_development',category: 'Marketing', status: 'Completed',            recipient: 7873,  delivered: 4200  },
-  { id: 11, name: 'flash sale november',  template: 'flash_sale_nov',          category: 'Marketing', status: 'Scheduled',            recipient: 3100,  delivered: 0     },
-  { id: 12, name: 'year end promo',       template: 'year_end_promo',          category: 'Utility',   status: 'In progress',          recipient: 1500,  delivered: 600   },
-  { id: 13, name: 'customer survey',      template: 'customer_survey',         category: 'Marketing', status: 'Completed',            recipient: 2000,  delivered: 1900  },
-  { id: 14, name: 'product launch',       template: 'product_launch',          category: 'Marketing', status: 'Failed',               recipient: 800,   delivered: 0     },
-  { id: 15, name: 'otp verification',     template: 'otp_verify',              category: 'Auth',      status: 'Completed',            recipient: 12000, delivered: 11900 },
-]
+const { campaigns: tableData } = useCampaigns()
 
 // --- Pagination ---
 const rowsPerPage = ref('10')
