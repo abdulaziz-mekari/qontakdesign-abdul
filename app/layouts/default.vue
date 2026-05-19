@@ -298,9 +298,20 @@
 
   <!-- Page content -->
   <div :style="contentStyle">
-    <MpFlex v-if="!hidePageHeader" justify="space-between" align-items="center" px="6" py="1.063rem">
-      <MpText size="h1" weight="semiBold">{{ activePageTitle }}</MpText>
-      <MpButton v-if="!hidePageAction" left-icon="add">Action</MpButton>
+    <MpFlex v-if="!hidePageHeader" direction="column" px="6" py="4">
+      <!-- Breadcrumb -->
+      <MpFlex v-if="pageBreadcrumb" alignItems="center" gap="1">
+        <MpText
+          size="body-small"
+          :style="{ color: 'var(--mp-colors-text-link)', cursor: 'pointer' }"
+          @click="router.push(pageBreadcrumb.route)"
+        >{{ pageBreadcrumb.label }}</MpText>
+      </MpFlex>
+      <!-- Title row -->
+      <MpFlex justify="space-between" align-items="center">
+        <MpText size="h1" weight="semiBold">{{ activePageTitle }}</MpText>
+        <MpButton v-if="!hidePageAction" left-icon="add" :variant="pageActionVariant" @click="handlePageAction">{{ pageActionLabel }}</MpButton>
+      </MpFlex>
     </MpFlex>
     <slot />
   </div>
@@ -686,6 +697,14 @@
   const isSubmenuOpen = computed(() => activeSubmenu.value !== null)
   const hidePageHeader = computed(() => !!route.meta.hidePageHeader)
   const hidePageAction = computed(() => !!route.meta.hidePageAction)
+  const pageActionLabel = computed(() => (route.meta.pageActionLabel as string) || 'Action')
+  const pageActionVariant = computed(() => (route.meta.pageActionVariant as string) || 'secondary')
+  const pageActionRoute = computed(() => route.meta.pageActionRoute as string | undefined)
+
+  function handlePageAction() {
+    if (pageActionRoute.value) router.push(pageActionRoute.value)
+  }
+  const pageBreadcrumb = computed(() => route.meta.pageBreadcrumb as { label: string; route: string } | undefined)
 
   // Active submenu data (title + items) for the panel
   const activeSubmenuData = computed(() => {
